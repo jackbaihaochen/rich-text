@@ -39,6 +39,7 @@ window.addEventListener("unhandledrejection", ({ reason }) =>
 );
 
 interface EditorAppProps {
+  limitRows?: number;
   readonlyMode: boolean;
   initialContent?: string;
   getContent?: (value: EditorState) => void;
@@ -48,6 +49,7 @@ export default function EditorApp({
   readonlyMode = false,
   initialContent,
   getContent,
+  limitRows,
 }: EditorAppProps): JSX.Element {
   if (readonlyMode) {
     console.log("initialContent", initialContent);
@@ -69,7 +71,10 @@ export default function EditorApp({
         <SharedHistoryContext>
           <TableContext>
             <SharedAutocompleteContext>
-              <div className={readonlyMode ? "" : "editor-shell"}>
+              <div
+                className={`${readonlyMode ? "" : "editor-shell"} ${limitRows ? "editor-limit-rows" : ""}`}
+                style={limitRows ? { WebkitLineClamp: limitRows } : undefined}
+              >
                 <Editor getContent={getContent} readonlyMode={readonlyMode} />
               </div>
             </SharedAutocompleteContext>

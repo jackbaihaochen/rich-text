@@ -98,7 +98,7 @@ export default function Editor({
   const text = isCollab
     ? "Enter some collaborative rich text..."
     : isRichText
-      ? "Enter some rich text..."
+      ? "入力してください..."
       : "Enter some plain text...";
   const placeholder = <Placeholder>{text}</Placeholder>;
   const [floatingAnchorElem, setFloatingAnchorElem] =

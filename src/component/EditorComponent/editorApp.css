@@ -52,6 +52,14 @@ header h1 {
   border-top-right-radius: 10px;
 }
 
+.editor-limit-rows {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
 .editor-scroller {
   min-height: 150px;
   border: 0;
