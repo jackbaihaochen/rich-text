@@ -27,7 +27,6 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
 import { useSettings } from "./context/SettingsContext";
 import { useSharedHistoryContext } from "./context/SharedHistoryContext";
-import AutocompletePlugin from "./plugins/AutocompletePlugin";
 import AutoEmbedPlugin from "./plugins/AutoEmbedPlugin";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeActionMenuPlugin from "./plugins/CodeActionMenuPlugin";
@@ -82,7 +81,6 @@ export default function Editor({
   const {
     settings: {
       isCollab,
-      isAutocomplete,
       isMaxLength,
       isCharLimit,
       isCharLimitUtf8,
@@ -240,7 +238,6 @@ export default function Editor({
             maxLength={5}
           />
         )}
-        {isAutocomplete && <AutocompletePlugin />}
         <div>{showTableOfContents && <TableOfContentsPlugin />}</div>
         {shouldUseLexicalContextMenu && <ContextMenuPlugin />}
         {/* <ActionsPlugin isRichText={isRichText} /> */}

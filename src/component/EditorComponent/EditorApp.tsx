@@ -14,7 +14,6 @@ import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { EditorState } from "lexical";
 
 import { SettingsContext } from "./context/SettingsContext";
-import { SharedAutocompleteContext } from "./context/SharedAutocompleteContext";
 import { SharedHistoryContext } from "./context/SharedHistoryContext";
 import Editor from "./Editor";
 import PlaygroundNodes from "./nodes/PlaygroundNodes";
@@ -73,14 +72,12 @@ export default function EditorApp({
       <LexicalComposer initialConfig={initialConfig}>
         <SharedHistoryContext>
           <TableContext>
-            <SharedAutocompleteContext>
-              <div
-                className={`${readonlyMode ? "" : "editor-shell"} ${limitRows ? "editor-limit-rows" : ""}`}
-                style={limitRows ? { WebkitLineClamp: limitRows } : undefined}
-              >
-                <Editor getContent={getContent} readonlyMode={readonlyMode} />
-              </div>
-            </SharedAutocompleteContext>
+            <div
+              className={`${readonlyMode ? "" : "editor-shell"} ${limitRows ? "editor-limit-rows" : ""}`}
+              style={limitRows ? { WebkitLineClamp: limitRows } : undefined}
+            >
+              <Editor getContent={getContent} readonlyMode={readonlyMode} />
+            </div>
           </TableContext>
         </SharedHistoryContext>
       </LexicalComposer>
