@@ -8,6 +8,7 @@
 
 import "./editorApp.css";
 import "./setupEnv";
+import * as React from "react";
 
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { EditorState } from "lexical";
@@ -19,6 +20,7 @@ import Editor from "./Editor";
 import PlaygroundNodes from "./nodes/PlaygroundNodes";
 import { TableContext } from "./plugins/TablePlugin";
 import PlaygroundEditorTheme from "./themes/PlaygroundEditorTheme";
+import parseContent from "./utils/parseContent";
 
 // Handle runtime errors
 const showErrorOverlay = (err: Event) => {
@@ -51,8 +53,9 @@ export default function EditorApp({
   getContent,
   limitRows,
 }: EditorAppProps): JSX.Element {
-  if (readonlyMode) {
-    console.log("initialContent", initialContent);
+  if (initialContent) {
+    // For compatibility. Parse the data from DB. Data can be old data as pure string or new data as EditorState formatted string.
+    initialContent = parseContent(initialContent);
   }
   const initialConfig = {
     editable: !readonlyMode,
