@@ -71,12 +71,14 @@ interface EditorProps {
   readonlyMode: boolean;
   getContent?: (value: EditorState) => void;
   ignoreItems?: IGNOREITEMS[];
+  limitRows?: number;
 }
 
 export default function Editor({
   getContent,
   readonlyMode,
   ignoreItems,
+  limitRows,
 }: EditorProps): JSX.Element {
   const editorStateRef = React.useRef<EditorState>();
 
@@ -140,9 +142,9 @@ export default function Editor({
         />
       )}
       <div
-        className={`editor-container ${showTreeView ? "tree-view" : ""} ${
+        className={`${readonlyMode ? "editor-container editor-container-readonly" : "editor-container"} ${showTreeView ? "tree-view" : ""} ${
           !isRichText ? "plain-text" : ""
-        }`}
+        } `}
       >
         {isMaxLength && <MaxLengthPlugin maxLength={30} />}
         <DragDropPaste />
@@ -164,7 +166,16 @@ export default function Editor({
             <HistoryPlugin externalHistoryState={historyState} />
             <RichTextPlugin
               contentEditable={
-                <div className={readonlyMode ? "" : "editor-scroller"}>
+                <div
+                  className={`
+                    ${
+                      readonlyMode
+                        ? "editor-scroller editor-scroller-readonly"
+                        : "editor-scroller"
+                    }
+                      ${limitRows ? "editor-limit-rows" : ""}`}
+                  style={limitRows ? { WebkitLineClamp: limitRows } : undefined}
+                >
                   <div className="editor" ref={onRef}>
                     <ContentEditable
                       className={

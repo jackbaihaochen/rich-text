@@ -35,6 +35,9 @@ header h1 {
   font-weight: 400;
 }
 
+.editor-shell .editor-container-readonly {
+  background: none !important;
+}
 .editor-shell .editor-container {
   background: #fff;
   position: relative;
@@ -54,7 +57,7 @@ header h1 {
 
 .editor-limit-rows {
   overflow: hidden;
-  display: -webkit-box;
+  display: -webkit-box !important;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
@@ -70,6 +73,10 @@ header h1 {
   overflow: auto;
   resize: vertical;
 }
+.editor-scroller-readonly {
+  min-height: auto !important;
+  resize: none !important;
+}
 
 .editor {
   flex: auto;
@@ -83,7 +90,7 @@ header h1 {
   width: 100%;
 }
 
-pre {
+.editor-shell pre {
   line-height: 1.1;
   background: #222;
   color: #fff;

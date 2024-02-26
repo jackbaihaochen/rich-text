@@ -73,10 +73,7 @@ export default function EditorApp({
       <LexicalComposer initialConfig={initialConfig}>
         <SharedHistoryContext>
           <TableContext>
-            <div
-              className={`${readonlyMode ? "" : "editor-shell"} ${limitRows ? "editor-limit-rows" : ""}`}
-              style={limitRows ? { WebkitLineClamp: limitRows } : undefined}
-            >
+            <div className={"editor-shell"}>
               <Editor
                 getContent={getContent}
                 readonlyMode={readonlyMode}
@@ -91,6 +88,7 @@ export default function EditorApp({
                   IGNOREITEMS.Youtube動画,
                   IGNOREITEMS.Figma,
                 ]}
+                limitRows={limitRows}
               />
             </div>
           </TableContext>
