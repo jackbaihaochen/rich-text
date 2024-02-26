@@ -41,7 +41,7 @@ window.addEventListener("unhandledrejection", ({ reason }) =>
 
 interface EditorAppProps {
   limitRows?: number;
-  readonlyMode: boolean;
+  readonlyMode?: boolean;
   initialContent?: string;
   getContent?: (value: EditorState) => void;
 }
