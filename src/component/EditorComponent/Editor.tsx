@@ -65,15 +65,18 @@ import YouTubePlugin from "./plugins/YouTubePlugin";
 import ContentEditable from "./ui/ContentEditable";
 import Placeholder from "./ui/Placeholder";
 import { EditorState } from "lexical";
+import IGNOREITEMS from "./utils/ignoreItems";
 
 interface EditorProps {
   readonlyMode: boolean;
   getContent?: (value: EditorState) => void;
+  ignoreItems?: IGNOREITEMS[];
 }
 
 export default function Editor({
   getContent,
   readonlyMode,
+  ignoreItems,
 }: EditorProps): JSX.Element {
   const editorStateRef = React.useRef<EditorState>();
 
@@ -131,7 +134,10 @@ export default function Editor({
   return (
     <>
       {isRichText && !readonlyMode && (
-        <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+        <ToolbarPlugin
+          setIsLinkEditMode={setIsLinkEditMode}
+          ignoreItems={ignoreItems}
+        />
       )}
       <div
         className={`editor-container ${showTreeView ? "tree-view" : ""} ${
@@ -218,6 +224,7 @@ export default function Editor({
                 />
                 <FloatingTextFormatToolbarPlugin
                   anchorElem={floatingAnchorElem}
+                  ignoreItems={ignoreItems}
                 />
               </>
             )}

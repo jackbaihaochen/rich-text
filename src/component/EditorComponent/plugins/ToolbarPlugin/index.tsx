@@ -88,6 +88,7 @@ import {
 import InsertLayoutDialog from "../LayoutPlugin/InsertLayoutDialog";
 import { InsertTableDialog } from "../TablePlugin";
 import FontSize from "./fontSize";
+import IGNOREITEMS from "../../utils/ignoreItems";
 
 const blockTypeToBlockName = {
   bullet: "箇条書き",
@@ -195,11 +196,13 @@ function BlockFormatDropDown({
   blockType,
   rootType,
   disabled = false,
+  ignoreItems,
 }: {
   blockType: keyof typeof blockTypeToBlockName;
   rootType: keyof typeof rootTypeToRootName;
   editor: LexicalEditor;
   disabled?: boolean;
+  ignoreItems?: IGNOREITEMS[];
 }): JSX.Element {
   const formatParagraph = () => {
     editor.update(() => {
@@ -314,27 +317,33 @@ function BlockFormatDropDown({
         <i className="icon bullet-list" />
         <span className="text">{blockTypeToBlockName.bullet}</span>
       </DropDownItem>
-      <DropDownItem
-        className={"item " + dropDownActiveClass(blockType === "number")}
-        onClick={formatNumberedList}
-      >
-        <i className="icon numbered-list" />
-        <span className="text">{blockTypeToBlockName.number}</span>
-      </DropDownItem>
-      <DropDownItem
-        className={"item " + dropDownActiveClass(blockType === "check")}
-        onClick={formatCheckList}
-      >
-        <i className="icon check-list" />
-        <span className="text">{blockTypeToBlockName.check}</span>
-      </DropDownItem>
-      <DropDownItem
-        className={"item " + dropDownActiveClass(blockType === "quote")}
-        onClick={formatQuote}
-      >
-        <i className="icon quote" />
-        <span className="text">{blockTypeToBlockName.quote}</span>
-      </DropDownItem>
+      {!ignoreItems?.includes(IGNOREITEMS.numberList) && (
+        <DropDownItem
+          className={"item " + dropDownActiveClass(blockType === "number")}
+          onClick={formatNumberedList}
+        >
+          <i className="icon numbered-list" />
+          <span className="text">{blockTypeToBlockName.number}</span>
+        </DropDownItem>
+      )}
+      {!ignoreItems?.includes(IGNOREITEMS.checkList) && (
+        <DropDownItem
+          className={"item " + dropDownActiveClass(blockType === "check")}
+          onClick={formatCheckList}
+        >
+          <i className="icon check-list" />
+          <span className="text">{blockTypeToBlockName.check}</span>
+        </DropDownItem>
+      )}
+      {!ignoreItems?.includes(IGNOREITEMS.quote) && (
+        <DropDownItem
+          className={"item " + dropDownActiveClass(blockType === "quote")}
+          onClick={formatQuote}
+        >
+          <i className="icon quote" />
+          <span className="text">{blockTypeToBlockName.quote}</span>
+        </DropDownItem>
+      )}
       {/* <DropDownItem
         className={"item " + dropDownActiveClass(blockType === "code")}
         onClick={formatCode}
@@ -521,8 +530,10 @@ function ElementFormatDropdown({
 
 export default function ToolbarPlugin({
   setIsLinkEditMode,
+  ignoreItems,
 }: {
   setIsLinkEditMode: Dispatch<boolean>;
+  ignoreItems?: IGNOREITEMS[];
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
@@ -862,6 +873,7 @@ export default function ToolbarPlugin({
             blockType={blockType}
             rootType={rootType}
             editor={editor}
+            ignoreItems={ignoreItems}
           />
           <Divider />
         </>
@@ -944,18 +956,20 @@ export default function ToolbarPlugin({
           >
             <i className="format underline" />
           </button>
-          <button
-            disabled={!isEditable}
-            onClick={() => {
-              activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-            }}
-            className={"toolbar-item spaced " + (isCode ? "active" : "")}
-            title="Insert code block"
-            type="button"
-            aria-label="Insert code block"
-          >
-            <i className="format code" />
-          </button>
+          {!ignoreItems?.includes(IGNOREITEMS.codeBlock) && (
+            <button
+              disabled={!isEditable}
+              onClick={() => {
+                activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
+              }}
+              className={"toolbar-item spaced " + (isCode ? "active" : "")}
+              title="Insert code block"
+              type="button"
+              aria-label="Insert code block"
+            >
+              <i className="format code" />
+            </button>
+          )}
           <button
             disabled={!isEditable}
             onClick={insertLink}
@@ -1123,6 +1137,7 @@ export default function ToolbarPlugin({
               <i className="icon table" />
               <span className="text">表</span>
             </DropDownItem>
+
             {/* <DropDownItem
               onClick={() => {
                 showModal("Insert Poll", (onClose) => (
@@ -1137,35 +1152,40 @@ export default function ToolbarPlugin({
               <i className="icon poll" />
               <span className="text">Poll</span>
             </DropDownItem> */}
-            <DropDownItem
-              onClick={() => {
-                showModal("コラムレイアウト", (onClose) => (
-                  <InsertLayoutDialog
-                    activeEditor={activeEditor}
-                    onClose={onClose}
-                  />
-                ));
-              }}
-              className="item"
-            >
-              <i className="icon columns" />
-              <span className="text">コラムレイアウト</span>
-            </DropDownItem>
 
-            <DropDownItem
-              onClick={() => {
-                showModal("計算式", (onClose) => (
-                  <InsertEquationDialog
-                    activeEditor={activeEditor}
-                    onClose={onClose}
-                  />
-                ));
-              }}
-              className="item"
-            >
-              <i className="icon equation" />
-              <span className="text">計算式</span>
-            </DropDownItem>
+            {!ignoreItems?.includes(IGNOREITEMS.columnLayout) && (
+              <DropDownItem
+                onClick={() => {
+                  showModal("コラムレイアウト", (onClose) => (
+                    <InsertLayoutDialog
+                      activeEditor={activeEditor}
+                      onClose={onClose}
+                    />
+                  ));
+                }}
+                className="item"
+              >
+                <i className="icon columns" />
+                <span className="text">コラムレイアウト</span>
+              </DropDownItem>
+            )}
+
+            {ignoreItems?.includes(IGNOREITEMS.equation) ? null : (
+              <DropDownItem
+                onClick={() => {
+                  showModal("計算式", (onClose) => (
+                    <InsertEquationDialog
+                      activeEditor={activeEditor}
+                      onClose={onClose}
+                    />
+                  ));
+                }}
+                className="item"
+              >
+                <i className="icon equation" />
+                <span className="text">計算式</span>
+              </DropDownItem>
+            )}
             {/* <DropDownItem
               onClick={() => {
                 editor.update(() => {
@@ -1188,21 +1208,28 @@ export default function ToolbarPlugin({
               <i className="icon caret-right" />
               <span className="text">Collapsible container</span>
             </DropDownItem> */}
-            {EmbedConfigs.map((embedConfig) => (
-              <DropDownItem
-                key={embedConfig.type}
-                onClick={() => {
-                  activeEditor.dispatchCommand(
-                    INSERT_EMBED_COMMAND,
-                    embedConfig.type
-                  );
-                }}
-                className="item"
-              >
-                {embedConfig.icon}
-                <span className="text">{embedConfig.contentName}</span>
-              </DropDownItem>
-            ))}
+            {EmbedConfigs.map((embedConfig) => {
+              for (const ignoreItem of ignoreItems || []) {
+                if (embedConfig.contentName === ignoreItem) {
+                  return null;
+                }
+              }
+              return (
+                <DropDownItem
+                  key={embedConfig.type}
+                  onClick={() => {
+                    activeEditor.dispatchCommand(
+                      INSERT_EMBED_COMMAND,
+                      embedConfig.type
+                    );
+                  }}
+                  className="item"
+                >
+                  {embedConfig.icon}
+                  <span className="text">{embedConfig.contentName}</span>
+                </DropDownItem>
+              );
+            })}
           </DropDown>
         </>
       )}

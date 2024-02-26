@@ -29,6 +29,7 @@ import { createPortal } from "react-dom";
 import { getDOMRangeRect } from "../../utils/getDOMRangeRect";
 import { getSelectedNode } from "../../utils/getSelectedNode";
 import { setFloatingElemPosition } from "../../utils/setFloatingElemPosition";
+import IGNOREITEMS from "../../utils/ignoreItems";
 
 function TextFormatFloatingToolbar({
   editor,
@@ -41,6 +42,7 @@ function TextFormatFloatingToolbar({
   isStrikethrough,
   isSubscript,
   isSuperscript,
+  ignoreItems,
 }: {
   editor: LexicalEditor;
   anchorElem: HTMLElement;
@@ -52,6 +54,7 @@ function TextFormatFloatingToolbar({
   isSubscript: boolean;
   isSuperscript: boolean;
   isUnderline: boolean;
+  ignoreItems?: IGNOREITEMS[];
 }): JSX.Element {
   const popupCharStylesEditorRef = useRef<HTMLDivElement | null>(null);
 
@@ -239,16 +242,18 @@ function TextFormatFloatingToolbar({
           >
             <i className="format superscript" />
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-            }}
-            className={"popup-item spaced " + (isCode ? "active" : "")}
-            aria-label="Insert code block"
-          >
-            <i className="format code" />
-          </button>
+          {!ignoreItems?.includes(IGNOREITEMS.codeBlock) && (
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
+              }}
+              className={"popup-item spaced " + (isCode ? "active" : "")}
+              aria-label="Insert code block"
+            >
+              <i className="format code" />
+            </button>
+          )}
           <button
             type="button"
             onClick={insertLink}
@@ -272,7 +277,8 @@ function TextFormatFloatingToolbar({
 
 function useFloatingTextFormatToolbar(
   editor: LexicalEditor,
-  anchorElem: HTMLElement
+  anchorElem: HTMLElement,
+  ignoreItems?: IGNOREITEMS[]
 ): JSX.Element | null {
   const [isText, setIsText] = useState(false);
   const [isLink, setIsLink] = useState(false);
@@ -380,6 +386,7 @@ function useFloatingTextFormatToolbar(
       isSuperscript={isSuperscript}
       isUnderline={isUnderline}
       isCode={isCode}
+      ignoreItems={ignoreItems}
     />,
     anchorElem
   );
@@ -387,9 +394,11 @@ function useFloatingTextFormatToolbar(
 
 export default function FloatingTextFormatToolbarPlugin({
   anchorElem = document.body,
+  ignoreItems,
 }: {
   anchorElem?: HTMLElement;
+  ignoreItems?: IGNOREITEMS[];
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
-  return useFloatingTextFormatToolbar(editor, anchorElem);
+  return useFloatingTextFormatToolbar(editor, anchorElem, ignoreItems);
 }

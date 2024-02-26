@@ -20,6 +20,7 @@ import PlaygroundNodes from "./nodes/PlaygroundNodes";
 import { TableContext } from "./plugins/TablePlugin";
 import PlaygroundEditorTheme from "./themes/PlaygroundEditorTheme";
 import parseContent from "./utils/parseContent";
+import IGNOREITEMS from "./utils/ignoreItems";
 
 // Handle runtime errors
 const showErrorOverlay = (err: Event) => {
@@ -76,7 +77,21 @@ export default function EditorApp({
               className={`${readonlyMode ? "" : "editor-shell"} ${limitRows ? "editor-limit-rows" : ""}`}
               style={limitRows ? { WebkitLineClamp: limitRows } : undefined}
             >
-              <Editor getContent={getContent} readonlyMode={readonlyMode} />
+              <Editor
+                getContent={getContent}
+                readonlyMode={readonlyMode}
+                ignoreItems={[
+                  IGNOREITEMS.numberList,
+                  IGNOREITEMS.checkList,
+                  IGNOREITEMS.quote,
+                  IGNOREITEMS.codeBlock,
+                  IGNOREITEMS.columnLayout,
+                  IGNOREITEMS.equation,
+                  IGNOREITEMS.Tweet,
+                  IGNOREITEMS.Youtube動画,
+                  IGNOREITEMS.Figma,
+                ]}
+              />
             </div>
           </TableContext>
         </SharedHistoryContext>
