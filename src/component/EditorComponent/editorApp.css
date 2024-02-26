@@ -1,4 +1,4 @@
-header {
+/* header {
   max-width: 580px;
   margin: auto;
   position: relative;
@@ -23,7 +23,7 @@ header h1 {
   color: #333;
   display: inline-block;
   margin: 20px 0 0 0;
-}
+} */
 
 .editor-shell {
   margin: 20px auto;
@@ -713,7 +713,7 @@ i.page-break,
 }
 
 .dropdown {
-  z-index: 100;
+  z-index: 100000;
   display: block;
   position: fixed;
   box-shadow:
