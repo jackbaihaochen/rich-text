@@ -191,7 +191,6 @@ export default function Editor({
             <OnChangePlugin
               onChange={(editorState) => {
                 editorStateRef.current = editorState;
-                console.log("editorState", editorStateRef.current.toJSON());
                 getContent?.(editorState);
               }}
             />

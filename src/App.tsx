@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import EditorApp from "./component/EditorComponent/EditorApp";
 import { EditorState } from "lexical";
+import { uploadAllImages } from "./component/EditorComponent/utils/uploadImage";
 
 export default function App() {
   const [content, setContent] = useState<string>();
@@ -12,7 +13,13 @@ export default function App() {
     setContent(JSON.stringify(value?.toJSON()));
   };
 
-  const refreshDisplay = () => {
+  const refreshDisplay = async () => {
+    if (content) {
+      const newContent = await uploadAllImages(content);
+      console.log("newContent", JSON.parse(newContent));
+      setContent(newContent);
+    }
+
     setRefresh(refresh + 1);
   };
 
@@ -43,7 +50,7 @@ export default function App() {
       <p>区切り線の下に保存された内容が表示されます</p>
       <hr />
       <EditorApp
-        limitRows={5}
+        // limitRows={5}
         readonlyMode={true}
         initialContent={content ? content : undefined}
         key={refresh}
