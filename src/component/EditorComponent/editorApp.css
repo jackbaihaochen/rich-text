@@ -35,6 +35,11 @@ header h1 {
   font-weight: 400;
 }
 
+.editor-shell.invalidate {
+  border: red 1px solid;
+  border-radius: 10px;
+}
+
 .editor-shell .editor-container-readonly {
   background: none !important;
 }

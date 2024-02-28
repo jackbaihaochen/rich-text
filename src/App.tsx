@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import EditorApp from "./component/EditorComponent/EditorApp";
 import { EditorState } from "lexical";
 import { uploadAllImages } from "./component/EditorComponent/utils/uploadImage";
+import { validateContent } from "./component/EditorComponent/utils/validateContent";
 
 export default function App() {
   const [content, setContent] = useState<string>();
@@ -15,8 +16,12 @@ export default function App() {
 
   const refreshDisplay = async () => {
     if (content) {
-      const newContent = await uploadAllImages(content);
+      const newContent = await uploadAllImages(
+        content,
+        "http://127.0.0.1:5000/upload"
+      );
       console.log("newContent", JSON.parse(newContent));
+      console.log("validate", validateContent(newContent));
       setContent(newContent);
     }
 

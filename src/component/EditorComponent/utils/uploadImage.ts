@@ -21,14 +21,14 @@ function base64ToBlob(base64String: string) {
 }
 
 // Upload all base64 images to the server and replace editor state with the new image URLs.
-async function uploadImage(base64String: string) {
+async function uploadImage(base64String: string, uploadUrl: string) {
   const blob = base64ToBlob(base64String);
   // Create a form data object and append the blob to it
   const formData = new FormData();
   formData.append("file", blob, `image${uuidv4()}.png`);
   try {
     // Send the form data to the server
-    const res = await fetch("http://127.0.0.1:5000/upload", {
+    const res = await fetch(uploadUrl ?? "http://127.0.0.1:5000/upload", {
       method: "POST",
       body: formData,
     });
@@ -36,7 +36,7 @@ async function uploadImage(base64String: string) {
     if (!data.url) {
       throw new Error("Upload failed");
     }
-    console.log(data);
+    console.log("Image update", data);
     // Replace the image node with the new URL
     return data.url;
   } catch (error) {
@@ -52,21 +52,24 @@ interface Node {
 }
 
 // Recursively traverse the node tree and upload all images
-async function loopThroughAllNodes(node: Node) {
+async function loopThroughAllNodes(node: Node, uploadUrl: string) {
   if (node.type === "image") {
-    let newSrc = await uploadImage(node.src!);
+    let newSrc = await uploadImage(node.src!, uploadUrl);
     if (newSrc) {
       node.src = newSrc;
     }
   } else if (node.children) {
     for (let i = 0; i < node.children.length; i++) {
-      node.children[i] = await loopThroughAllNodes(node.children[i]);
+      node.children[i] = await loopThroughAllNodes(node.children[i], uploadUrl);
     }
   }
   return node;
 }
 
-export async function uploadAllImages(content: string) {
-  const newNode = await loopThroughAllNodes(JSON.parse(content!).root);
+export async function uploadAllImages(content: string, uploadUrl: string) {
+  const newNode = await loopThroughAllNodes(
+    JSON.parse(content!).root,
+    uploadUrl
+  );
   return JSON.stringify({ root: newNode });
 }

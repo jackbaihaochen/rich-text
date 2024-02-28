@@ -73,7 +73,9 @@ export default function EditorApp({
       <LexicalComposer initialConfig={initialConfig}>
         <SharedHistoryContext>
           <TableContext>
-            <div className={"editor-shell"}>
+            <div
+              className={`editor-shell ${readonlyMode ? "editor-shell-readonly" : "editor-shell-editable"}`}
+            >
               <Editor
                 getContent={getContent}
                 readonlyMode={readonlyMode}
