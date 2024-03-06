@@ -11,7 +11,7 @@ import "./setupEnv";
 import * as React from "react";
 
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { EditorState } from "lexical";
+import { EditorState, TextNode } from "lexical";
 
 import { SettingsContext } from "./context/SettingsContext";
 import { SharedHistoryContext } from "./context/SharedHistoryContext";
@@ -21,6 +21,7 @@ import { TableContext } from "./plugins/TablePlugin";
 import PlaygroundEditorTheme from "./themes/PlaygroundEditorTheme";
 import parseContent from "./utils/parseContent";
 import IGNOREITEMS from "./utils/ignoreItems";
+import { ExtendedTextNode } from "./nodes/ExtendedTextNode";
 
 // Handle runtime errors
 const showErrorOverlay = (err: Event) => {
@@ -62,7 +63,14 @@ export default function EditorApp({
     // Initial editor state
     editorState: initialContent ?? undefined,
     namespace: "Playground",
-    nodes: [...PlaygroundNodes],
+    nodes: [
+      ...PlaygroundNodes,
+      ExtendedTextNode,
+      {
+        replace: TextNode,
+        with: (node: TextNode) => new ExtendedTextNode(node.__text),
+      },
+    ],
     onError: (error: Error) => {
       throw error;
     },
