@@ -340,9 +340,11 @@ function TableActionMenu({
   };
 
   const insertTableRowAtSelection = useCallback(
-    (shouldInsertAfter: boolean) => {
+    (shouldInsertAfter: boolean, rowCount: number) => {
       editor.update(() => {
-        $insertTableRow__EXPERIMENTAL(shouldInsertAfter);
+        for (let i = 0; i < rowCount; i++) {
+          $insertTableRow__EXPERIMENTAL(shouldInsertAfter);
+        }
         onClose();
       });
     },
@@ -525,7 +527,7 @@ function TableActionMenu({
         type="button"
         className="item"
         onClick={() =>
-          showColorPickerModal("Cell background color", () => (
+          showColorPickerModal("塗りつぶしの色", () => (
             <ColorPicker
               color={backgroundColor}
               onChange={handleCellBackgroundColor}
@@ -534,31 +536,31 @@ function TableActionMenu({
         }
         data-test-id="table-background-color"
       >
-        <span className="text">Background color</span>
+        <span className="text">塗りつぶしの色</span>
       </button>
       <hr />
       <button
         type="button"
         className="item"
-        onClick={() => insertTableRowAtSelection(false)}
+        onClick={() => insertTableRowAtSelection(false, selectionCounts.rows)}
         data-test-id="table-insert-row-above"
       >
         <span className="text">
-          Insert{" "}
-          {selectionCounts.rows === 1 ? "row" : `${selectionCounts.rows} rows`}{" "}
-          above
+          上に{" "}
+          {selectionCounts.rows === 1 ? "1行" : `${selectionCounts.rows} 行`}{" "}
+          挿入
         </span>
       </button>
       <button
         type="button"
         className="item"
-        onClick={() => insertTableRowAtSelection(true)}
+        onClick={() => insertTableRowAtSelection(true, selectionCounts.rows)}
         data-test-id="table-insert-row-below"
       >
         <span className="text">
-          Insert{" "}
-          {selectionCounts.rows === 1 ? "row" : `${selectionCounts.rows} rows`}{" "}
-          below
+          下に{" "}
+          {selectionCounts.rows === 1 ? "1行" : `${selectionCounts.rows} 行`}{" "}
+          挿入
         </span>
       </button>
       <hr />
@@ -569,11 +571,11 @@ function TableActionMenu({
         data-test-id="table-insert-column-before"
       >
         <span className="text">
-          Insert{" "}
+          左に{" "}
           {selectionCounts.columns === 1
-            ? "column"
-            : `${selectionCounts.columns} columns`}{" "}
-          left
+            ? "1列"
+            : `${selectionCounts.columns} 列`}{" "}
+          挿入
         </span>
       </button>
       <button
@@ -583,11 +585,11 @@ function TableActionMenu({
         data-test-id="table-insert-column-after"
       >
         <span className="text">
-          Insert{" "}
+          右に{" "}
           {selectionCounts.columns === 1
-            ? "column"
-            : `${selectionCounts.columns} columns`}{" "}
-          right
+            ? "1列"
+            : `${selectionCounts.columns} 列`}{" "}
+          挿入
         </span>
       </button>
       <hr />
@@ -597,7 +599,7 @@ function TableActionMenu({
         onClick={() => deleteTableColumnAtSelection()}
         data-test-id="table-delete-columns"
       >
-        <span className="text">Delete column</span>
+        <span className="text">列を削除</span>
       </button>
       <button
         type="button"
@@ -605,7 +607,7 @@ function TableActionMenu({
         onClick={() => deleteTableRowAtSelection()}
         data-test-id="table-delete-rows"
       >
-        <span className="text">Delete row</span>
+        <span className="text">行を削除</span>
       </button>
       <button
         type="button"
@@ -613,7 +615,7 @@ function TableActionMenu({
         onClick={() => deleteTableAtSelection()}
         data-test-id="table-delete"
       >
-        <span className="text">Delete table</span>
+        <span className="text">表を削除</span>
       </button>
       <hr />
       <button
@@ -622,11 +624,11 @@ function TableActionMenu({
         onClick={() => toggleTableRowIsHeader()}
       >
         <span className="text">
+          列の先頭を
           {(tableCellNode.__headerState & TableCellHeaderStates.ROW) ===
           TableCellHeaderStates.ROW
-            ? "Remove"
-            : "Add"}{" "}
-          row header
+            ? "削除"
+            : "挿入"}{" "}
         </span>
       </button>
       <button
@@ -636,11 +638,11 @@ function TableActionMenu({
         data-test-id="table-column-header"
       >
         <span className="text">
+          行の先頭を
           {(tableCellNode.__headerState & TableCellHeaderStates.COLUMN) ===
           TableCellHeaderStates.COLUMN
-            ? "Remove"
-            : "Add"}{" "}
-          column header
+            ? "削除"
+            : "挿入"}{" "}
         </span>
       </button>
     </div>,
