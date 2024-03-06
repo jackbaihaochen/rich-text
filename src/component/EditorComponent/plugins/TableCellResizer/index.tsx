@@ -335,6 +335,7 @@ function TableCellResizer({ editor }: { editor: LexicalEditor }): JSX.Element {
           left: `${window.pageXOffset + left}px`,
           top: `${window.pageYOffset + top + height}px`,
           width: `${width}px`,
+          zIndex: 10000,
         },
         right: {
           backgroundColor: "none",
@@ -343,6 +344,7 @@ function TableCellResizer({ editor }: { editor: LexicalEditor }): JSX.Element {
           left: `${window.pageXOffset + left + width}px`,
           top: `${window.pageYOffset + top}px`,
           width: "10px",
+          zIndex: 10000,
         },
       };
 
