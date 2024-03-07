@@ -11,6 +11,9 @@ import type { ElementNode, LexicalEditor } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import useLexicalEditable from "@lexical/react/useLexicalEditable";
 import {
+  $computeTableMap,
+  $createTableCellNode,
+  $createTableRowNode,
   $deleteTableColumn__EXPERIMENTAL,
   $deleteTableRow__EXPERIMENTAL,
   $getNodeTriplet,
@@ -343,7 +346,9 @@ function TableActionMenu({
     (shouldInsertAfter: boolean, rowCount: number) => {
       editor.update(() => {
         for (let i = 0; i < rowCount; i++) {
-          $insertTableRow__EXPERIMENTAL(shouldInsertAfter);
+          $insertTableRow(shouldInsertAfter);
+          // Don't use this, it's experimental and have some bugs
+          // $insertTableRow__EXPERIMENTAL(shouldInsertAfter);
         }
         onClose();
       });
@@ -804,3 +809,100 @@ export default function TableActionMenuPlugin({
     anchorElem
   );
 }
+
+function $insertTableRow(shouldInsertAfter: boolean) {
+  const selection = $getSelection() as TableSelection;
+  const focus = selection.focus.getNode();
+  const [focusCell, , grid] = $getNodeTriplet(focus);
+  const [gridMap, focusCellMap] = $computeTableMap(grid, focusCell, focusCell);
+  const columnCount = gridMap[0].length;
+  const { startRow: focusStartRow } = focusCellMap;
+  const anchor = selection.anchor.getNode();
+  const [anchorCell, ,] = $getNodeTriplet(anchor);
+  const [, anchorCellMap] = $computeTableMap(grid, anchorCell, anchorCell);
+  const { startRow: anchorStartRow } = anchorCellMap;
+  if (shouldInsertAfter) {
+    const selectedBottomRow =
+      focusStartRow >= anchorStartRow ? focusStartRow : anchorStartRow;
+    const selectedBottomCell =
+      focusStartRow >= anchorStartRow ? focusCell : anchorCell;
+
+    const selectedEndRow = selectedBottomRow + selectedBottomCell.__rowSpan - 1;
+    const selectedEndRowMap = gridMap[selectedEndRow];
+    const newRow = $createTableRowNode();
+    for (let i = 0; i < columnCount; i++) {
+      const { cell, startRow } = selectedEndRowMap[i];
+      if (startRow + cell.__rowSpan - 1 <= selectedEndRow) {
+        const currentCell = selectedEndRowMap[i].cell as TableCellNode;
+        const currentCellHeaderState = currentCell.__headerState;
+
+        const headerState = _getHeaderState(
+          currentCellHeaderState,
+          TableCellHeaderStates.COLUMN
+        );
+
+        newRow.append(
+          $createTableCellNode(headerState).append($createParagraphNode())
+        );
+      } else {
+        cell.setRowSpan(cell.__rowSpan + 1);
+      }
+    }
+    const thisEndRowNode = grid.getChildAtIndex(selectedEndRow);
+    invariant(
+      $isTableRowNode(thisEndRowNode),
+      "thisEndRowNode is not a TableRowNode"
+    );
+    thisEndRowNode.insertAfter(newRow);
+  } else {
+    const selectedTopRow =
+      focusStartRow <= anchorStartRow ? focusStartRow : anchorStartRow;
+    const selectedTopRowMap = gridMap[selectedTopRow];
+    const newRow = $createTableRowNode();
+    for (let i = 0; i < columnCount; i++) {
+      const { cell, startRow } = selectedTopRowMap[i];
+      if (startRow === selectedTopRow) {
+        const currentCell = selectedTopRowMap[i].cell as TableCellNode;
+        const currentCellHeaderState = currentCell.__headerState;
+
+        const headerState = _getHeaderState(
+          currentCellHeaderState,
+          TableCellHeaderStates.COLUMN
+        );
+        newRow.append(
+          $createTableCellNode(headerState).append($createParagraphNode())
+        );
+      } else {
+        cell.setRowSpan(cell.__rowSpan + 1);
+      }
+    }
+    const selectedTopRowNode = grid.getChildAtIndex(selectedTopRow);
+    invariant(
+      $isTableRowNode(selectedTopRowNode),
+      "focusEndRow is not a TableRowNode"
+    );
+    selectedTopRowNode.insertBefore(newRow);
+  }
+}
+
+const _TableCellHeaderStates = {
+  BOTH: 3,
+  COLUMN: 2,
+  NO_STATUS: 0,
+  ROW: 1,
+};
+type _TableCellHeaderState =
+  (typeof _TableCellHeaderStates)[keyof typeof _TableCellHeaderStates];
+
+const _getHeaderState = (
+  currentState: _TableCellHeaderState,
+  possibleState: _TableCellHeaderState
+): _TableCellHeaderState => {
+  if (
+    currentState === _TableCellHeaderStates.BOTH ||
+    currentState === possibleState
+  ) {
+    return possibleState;
+  }
+  return _TableCellHeaderStates.NO_STATUS;
+};
